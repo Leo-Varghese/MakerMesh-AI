@@ -1,0 +1,9 @@
+'use client';
+import {workflow} from '@/lib/demo';
+import {canAdvance} from '@/lib/rules';
+import type {InspectionStatus} from '@/lib/types';
+import {CircleCheck,LockKeyhole} from 'lucide-react';
+export default function Workflow({stage,setStage,quality,history}:{stage:number;setStage:(n:number)=>void;quality:InspectionStatus;history:string[]}) {
+ const allowed=canAdvance(stage,quality);
+ return <div className="grid lg:grid-cols-3 gap-5"><section className="card p-6 lg:col-span-2"><h2 className="font-bold text-xl">MM-1042 · Motor Mount</h2><p className="muted text-sm">Simulated fulfillment timeline · no real funds</p><div className="mt-7">{workflow.map((x,i)=><div className="flex gap-4 min-h-16" key={x}><div className="flex flex-col items-center"><div className={`h-8 w-8 rounded-full grid place-items-center ${i<=stage?'bg-teal-600 text-white':'bg-slate-200'}`}>{i<stage?<CircleCheck size={18}/>:i+1}</div>{i<7&&<div className="w-0.5 grow bg-slate-200"/>}</div><div><b>{x}</b><div className="text-xs muted">{i<stage?'Completed demo transition':i===stage?'Current stage':'Pending'}</div></div></div>)}</div></section><section className="card p-6"><LockKeyhole className="text-cyan-700"/><h3 className="font-bold text-lg mt-4">Workflow controls</h3><p className="text-sm muted mt-2">No payment credentials are collected and no funds are held.</p><p className="mt-4">Current: <b>{workflow[stage]}</b></p><p>Quality: <b>{quality}</b></p>{stage>=5&&quality!=='Pass'&&<p role="alert" className="text-red-700 mt-3">Quality Pass is required before delivery or payout.</p>}<button disabled={!allowed} onClick={()=>{if(canAdvance(stage,quality))setStage(stage+1)}} className="btn primary w-full mt-5">{stage===6?'Release payout (Simulated)':stage===5?'Confirm delivered':'Advance status'}</button><h3 className="font-bold mt-6">Activity history</h3><ul className="text-xs muted space-y-2 mt-2">{history.map((entry,i)=><li key={i}>{entry}</li>)}</ul></section></div>;
+}
